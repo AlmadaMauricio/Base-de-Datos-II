@@ -31,10 +31,55 @@ or TA.TipoArchivo LIKE '%GIF%'
 /*5 Listar los nombres de archivos, su extensión, el tamaño en megabytes y
 la fecha de creación de aquellos archivos que le pertenezcan al usuario dueño con nombre 'Michael' y apellido 'Williams'.*/
 
+/*/7 Listar nombres de archivos, extensión, tamaño en bytes, fecha de creación y de modificación,
+apellido y nombre del usuario dueño de aquellos archivos cuya descripción contengan el término 'empresa' o 'presupuesto'*/
+Select A.Nombre, A.Extension, A.Tamaño, A.FechaCreacion, FechaUltimaModificacion, U.Apellido, U.Nombre
+From Archivos A
+Inner Join Usuarios U On A.IdUsuarioDueño = U.IdUsuario
+Where A.Descripcion Like '%Empresa%' 
+or A.Descripcion Like '%Presupuesto%';
 
 
+/*/8 Listar las extensiones sin repetir de los archivos cuyos usuarios dueños tengan tipo de usuario 'Suscripción Plus', 'Suscripción Premium' o 'Suscripción Empresarial'*/
+Select Distinct A.Extension
+From Archivos A
+Inner Join Usuarios U On A.IdUsuarioDueño = U.IdUsuario
+Inner Join TiposUsuario TU On U.IdTipoUsuario = TU.idTipoUsuario
+Where TU.TipoUsuario In ('Suscripción Plus', 'Suscripción Premium', 'Suscripción Empresarial')
 
+/*9 Listar los apellidos y nombres de los usuarios dueños y el tamaño del archivo de los tres archivos con extensión 'zip' más pesados.
+Puede ocurrir que el mismo usuario aparezca varias veces en el listado.*/
 
+Select Top(3) U.Nombre, U.Apellido, A.Tamaño
+From Usuarios U
+Inner Join Archivos A on A.IdUsuarioDueño = U.IdUsuario
+Where A.Extension = 'ZIP'
+Order By Tamaño Desc;
+
+/*10 Por cada archivo listar el nombre del archivo, la extensión, el tamaño en bytes, el nombre del tipo de archivo y el tamaño calculado en su mayor expresión y la unidad calculada. Siendo Gigabytes si al menos pesa un gigabyte, Megabytes si al menos pesa un megabyte, Kilobyte si al menos pesa un kilobyte o en su defecto expresado en bytes.
+Por ejemplo, si el archivo imagen.jpg pesa 40960 bytes entonces debe figurar 40 en la columna Tamaño Calculado y 'Kilobytes' en la columna unidad.*/
+
+SELECT 
+    A.NombreArchivo, A.Extension, A.Tamaño AS TamañoBytes, T.NombreTipoArchivo,
+    CASE 
+        WHEN A.Tamaño >= 1073741824 THEN A.Tamaño / 1073741824
+        WHEN A.Tamaño >= 1048576   THEN A.Tamaño / 1048576
+        WHEN A.Tamaño >= 1024      THEN A.Tamaño / 1024
+        ELSE A.Tamaño
+    END AS TamañoCalculado,
+    CASE 
+        WHEN A.Tamaño >= 1073741824 THEN 'Gigabytes'
+        WHEN A.Tamaño >= 1048576   THEN 'Megabytes'
+        WHEN A.Tamaño >= 1024      THEN 'Kilobytes'
+        ELSE 'Bytes'
+    END AS Unidad
+FROM Archivos A
+INNER JOIN TiposArchivo T ON A.IdTipoArchivo = T.IdTipoArchivo;
+
+/*11 Listar los nombres de archivo y extensión de los archivos que han sido compartidos.*/
+Select A.Nombre, A.Extension
+From Archivos A
+Inner Join ArchivosCompartidos AC On A.idArchivo = AC.IdArchivo;
 
 
 
