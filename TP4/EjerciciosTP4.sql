@@ -115,4 +115,13 @@ Inner Join Usuarios U On TU.IDTipoUsuario = U.IDTipoUsuario
 Inner Join Archivos A On U.IDUsuario = A.IDUsuario
 Where A.Tamaño >= 125829120;
 
+/*17 Listar los apellidos y nombres de los usuarios dueños, nombre del archivo, extensión, fecha de creación, fecha de modificación
+y la cantidad de días transcurridos desde la última modificación.
+Sólo incluir a los archivos que se hayan modificado (fecha de modificación distinta a la fecha de creación).*/
+Select U.Nombre As NombreUsuario, U.Apellido, A.Nombre As NombreArchivo, A.Extension, A.FechaCreacion, A.FechaUltimaModificacion,
+Datediff(day, A.FechaUltimaModificacion, GETDATE()) As DiasTrasncurridos
+From Usuarios U
+Inner Join Archivos A On U.IDUsuario = A.IDUsuarioDueño
+where A.FechaCreacion != A.FechaUltimaModificacion;
+
 
