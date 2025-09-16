@@ -81,6 +81,38 @@ Select A.Nombre, A.Extension
 From Archivos A
 Inner Join ArchivosCompartidos AC On A.idArchivo = AC.IdArchivo;
 
+/*12 Listar los nombres de archivo y extensión de los archivos que han sido compartidos a usuarios con apellido 'Clarck' o 'Jones'*/
+Select A.Nombre, A.Extension
+From Archivos A
+Inner Join ArchivosCompartidos AC On A.IDArchivo = AC.IDArchivo
+Inner Join Usuarios U On U.IDUsuario = AC.IDUsuario
+Where U.Apellido = 'Clarck' Or U.Apellido = 'Jones';
 
+/*13 Listar los nombres de archivo, extensión, apellidos y nombres de los usuarios a quienes se le hayan compartido archivos con permiso de 'Escritura'*/
+Select A.Nombre, A.Extension, U.Apellido, U.Nombre
+From Archivos A
+Inner Join ArchivosCompartidos AC on AC.IDArchivo = A.IDArchivo
+Inner Join Usuarios U on AC.IDUsuario = U.IDUsuario
+Inner Join Permisos P on AC.IDPermiso = P.IDPermiso
+Where P.Nombre = 'Escritura'
+
+/*14 Listar los nombres de archivos y extensión de los archivos que no han sido compartidos.*/
+Select A.Nombre, A.Extension
+From Archivos A
+Left Join ArchivosCompartidos AC On A.IDArchivo = AC.IDArchivo
+Where AC.IDArchivo IS NULL;
+
+/*15 Listar los apellidos y nombres de los usuarios dueños que tienen archivos eliminados.*/
+Select U.Apellido, U.Nombre
+From Usuarios U
+Inner Join Archivos A On U.IDUsuario = A.IDUsuarioDueño
+Where A.Eliminado = 1;
+
+/*16 Listar los nombres de los tipos de suscripciones, sin repetir, que tienen archivos que pesan al menos 120 Megabytes.*/
+Select Distinct TU.TipoUsuario
+From TiposUsuario TU
+Inner Join Usuarios U On TU.IDTipoUsuario = U.IDTipoUsuario
+Inner Join Archivos A On U.IDUsuario = A.IDUsuario
+Where A.Tamaño >= 125829120;
 
 
