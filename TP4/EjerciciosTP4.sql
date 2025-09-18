@@ -156,6 +156,23 @@ Inner Join TiposUsuario TUD On TUD.IDTipoUsuario = UsDue.IDTipoUsuario
 Inner Join TiposUsuario TUC On TUC.IDTipoUsuario = UsCom.IDTipoUsuario
 Where (TUD.IDTipoUsuario = TUC.IDTipoUsuario);
 
+/*20 Apellido y nombre de los usuarios que tengan compartido o sean dueños del archivo con nombre 'Documento Legal'.*/
+-- Usuarios que son dueños del archivo 'Documento Legal'
+Select U.Apellido, U.Nombre
+From Usuarios U
+Inner Join Archivos A On A.IDUsuarioDueño = U.IDUsuario
+Where A.Nombre = 'Documento Legal'
+
+UNION
+
+-- Usuarios que tienen el archivo 'Documento Legal' compartido
+Select U.Apellido, U.Nombre
+From Usuarios U
+Inner Join ArchivosCompartidos Ac On Ac.IDUsuario = U.IDUsuario
+Inner Join Archivos A On A.IDArchivo = Ac.IDArchivo
+Where A.Nombre = 'Documento Legal';
+
+
 
 
 
