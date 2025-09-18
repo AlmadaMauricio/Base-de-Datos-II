@@ -124,4 +124,42 @@ From Usuarios U
 Inner Join Archivos A On U.IDUsuario = A.IDUsuarioDueño
 where A.FechaCreacion != A.FechaUltimaModificacion;
 
+/*18 Listar nombres de archivos, extensión, tamaño,
+apellido y nombre del usuario dueño del archivo,
+apellido y nombre del usuario que tiene el archivo compartido
+y el nombre de permiso otorgado.*/
+Select A.Nombre As NombreArchivo, A.Extension, A.Tamaño, --Archivos
+UsDue.Apellido As ApellidoDueño, UsDue.Nombre As NombreDueño, --Usuarios Dueños
+UsCom.Apellido As ApellidoCompartido, UsCom.Nombre As NombreCompartido, -- Usuarios Compartidos
+P.Nombre --Permiso
+From Archivos A
+Inner Join ArchivosCompartidos Ac On A.IDArchivo = Ac.IDArchivo
+Inner Join Usuarios UsDue On UsDue.IDUsuario = A.IDUsuarioDueño
+Inner Join Usuarios UsCom On UsCom.IDUsuario = Ac.IDUsuario
+Inner Join Permisos P On P.IDPermiso = Ac.IDPermiso
+
+/*19 Listar nombres de archivos, extensión, tamaño,
+apellido y nombre del usuario dueño del archivo,
+apellido y nombre del usuario que tiene el archivo compartido
+y el nombre de permiso otorgado.
+Sólo listar aquellos registros cuyos tipos de usuarios coincidan tanto para el dueño como para el usuario al que le comparten el archivo.*/
+Select A.Nombre, A.Extension, A.Tamaño, --Archivos
+UsDue.Apellido As ApellidoDueño, UsDue.Nombre As NombreDueño, --Usuarios Dueños (Usuarios)
+UsCom.Apellido As ApellidoCompartido, UsCom.Nombre As NombreCompartido, --Usuarios Compartidos (ArchivosCompartidos)
+P.Nombre --Permiso
+From Archivos A
+Inner Join ArchivosCompartidos Ac On Ac.IDArchivo = A.IDArchivo
+Inner Join Usuarios UsDue On UsDue.IDUsuario = A.IDUsuarioDueño
+Inner Join Usuarios UsCom On UsCom.IDUsuario = Ac.IDUsuario
+Inner Join Permisos P On P.IDPermiso = Ac.IDPermiso
+Inner Join TiposUsuario TUD On TUD.IDTipoUsuario = UsDue.IDTipoUsuario
+Inner Join TiposUsuario TUC On TUC.IDTipoUsuario = UsCom.IDTipoUsuario
+Where (TUD.IDTipoUsuario = TUC.IDTipoUsuario);
+
+
+
+
+
+
+
 
