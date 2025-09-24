@@ -68,6 +68,31 @@ From TiposArchivos TA
 Inner Join Archivos A On TA.IDTipoArchivo = A.IDTipoArchivo
 GROUP BY TA.TipoArchivo;
 
+/*12 Por cada extensión, indicar la extensión, la cantidad de archivos con esa extensión y el total acumulado en bytes.
+Ordenado por cantidad de archivos de forma ascendente.*/
+Select A.Extension, Count(A.Extension) As 'CantidadExtension', SUM(A.Tamaño) As 'AcumuladoBytes'
+From Archivos A
+Group By A.Extension
+Order By CantidadExtension ASC;
+
+/*13 Por cada usuario, indicar IDUSuario, Apellido, Nombre y la sumatoria total en bytes de los archivos que es dueño.
+Si algún usuario no registra archivos indicar 0 en la sumatoria total.*/
+Select U.IDUsuario, U.Apellido, U.Nombre, ISNULL(SUM(A.Tamaño), 0) As 'TamañoArchivos'
+From Usuarios U
+Left Join Archivos A On U.IDUsuario = A.IDUsuarioDueño
+GROUP BY U.IDUsuario, U.Apellido, U.Nombre;
+
+/*14 Los tipos de archivos que fueron compartidos más de una vez con el permiso con nombre 'Lectura'*/
+Select TA.TipoArchivo, Count(TA.IDTipoArchivo) As 'CantidadCompartido'
+From TiposArchivos TA
+Inner Join Archivos A On TA.IDTipoArchivo = A.IDTipoArchivo
+Inner Join ArchivosCompartidos AC On A.IDArchivo = AC.IDArchivo
+Inner Join Permisos P On AC.IDPermiso = P.IDPermiso
+Where P.Nombre = 'Lectura'
+GROUP BY TA.TipoArchivo
+Having Count(TA.IDTipoArchivo) > 1; 
+
+
 
 
 
