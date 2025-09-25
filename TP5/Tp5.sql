@@ -93,9 +93,33 @@ GROUP BY TA.TipoArchivo
 Having Count(TA.IDTipoArchivo) > 1; 
 
 
+/*16 Por cada tipo de archivo indicar el tipo de archivo y el tamaño del archivo de dicho tipo que sea más pesado.*/
+SELECT A.IDArchivo, TA.TipoArchivo, A.Tamaño
+FROM Archivos A
+INNER JOIN TiposArchivos TA ON A.IDTipoArchivo = TA.IDTipoArchivo
+INNER JOIN (SELECT IDTipoArchivo, MAX(Tamaño) AS TamañoMaximo
+    FROM Archivos
+    GROUP BY IDTipoArchivo
+) AS SubQ
+ON A.IDTipoArchivo = SubQ.IDTipoArchivo AND A.Tamaño = SubQ.TamañoMaximo;
 
 
+/*17 El nombre del tipo de archivo y el promedio de tamaño de los archivos que corresponden a dicho tipo de archivo.
+Solamente listar aquellos registros que superen los 50 Megabytes de promedio.*/
+Select TA.TipoArchivo, AVG(A.Tamaño) As 'Promedio'
+From TiposArchivos TA
+Inner Join Archivos A On TA.IDTipoArchivo = A.IDTipoArchivo
+GROUP BY TA.TipoArchivo
+Having AVG(A.Tamaño) > 52428800;
 
+
+/*18 Listar las extensiones que registren más de 2 archivos que no hayan sido compartidos.*/
+Select A.Extension
+From Archivos A
+LEFT JOIN ArchivosCompartidos AC On A.IDArchivo = AC.IDArchivo
+Where AC.IDArchivo IS NULL
+GROUP BY A.Extension
+Having Count(A.Extension) > 2;
 
 
 
