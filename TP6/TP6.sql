@@ -35,7 +35,30 @@ From TiposUsuario TU
 Inner Join Usuarios U On TU.IDTipoUsuario = U.IDTipoUsuario
 Where not exists (select IDUsuarioDueño From Archivos A Where A.IDUsuarioDueño = U.IDUsuario And Eliminado = 1);
 
+/*5 Los tipos de archivos que no se hayan compartido con el permiso de 'Lectura'*/
+SELECT TU.TipoArchivo
+FROM TiposArchivos TU
+WHERE NOT EXISTS (
+SELECT 1
+FROM Archivos A
+INNER JOIN ArchivosCompartidos AC ON A.IDArchivo = AC.IDArchivo
+INNER JOIN Permisos P ON AC.IDPermiso = P.IDPermiso
+WHERE P.Nombre = 'Lectura'
+AND A.IDTipoArchivo = TU.IDTipoArchivo
+);
 
+/*6 Los nombres y extensiones de los archivos que tengan un tamaño mayor al del archivo con extensión 'xls' más grande.*/
+Select A.Nombre, A.Extension
+From Archivos A
+Where A.Tamaño > (Select Max(Ar.Tamaño) From Archivos Ar Where Ar.Extension = 'xls');
 
+/*7 Los nombres y extensiones de los archivos que tengan un tamaño mayor al del archivo con extensión 'zip' más pequeño.*/
+Select A.Nombre, A.Extension
+From Archivos A
+Where A.Tamaño > (Select Min(Ar.Tamaño) From Archivos Ar Where Ar.Extension = 'zip');
+
+/*8 Por cada tipo de archivo indicar el tipo y la cantidad de archivos eliminados y la cantidad de archivos no eliminados.*/
+Select TA.TipoArchivo
+From TiposArchivos TA
 
 
