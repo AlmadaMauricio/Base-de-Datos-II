@@ -97,7 +97,31 @@ WHERE AC2.IDArchivo = A.IDArchivo
 AND P2.Nombre = 'Lectura');
 
 /*12 Los tipos de archivos que registran más archivos eliminados que no eliminados.*/
+Select TA.TipoArchivo,
+Sum(Case when A.Eliminado = 1 then 1 else 0 end) As 'Eliminado',
+Sum(Case when A.Eliminado = 0 then 1 else 0 end) As 'NoEliminado'
+From TiposArchivos TA
+Inner Join Archivos A On TA.IDTipoArchivo = A.IDTipoArchivo
+GROUP BY TA.TipoArchivo
+Having Sum(Case when A.Eliminado = 1 then 1 else 0 end) > Sum(Case when A.Eliminado = 0 then 1 else 0 end);
 
+/*13 Los usuario que registren más archivos pequeños que archivos grandes (pero que al menos registren un archivo de cada uno)*/
+SELECT 
+    U.IDUsuario,
+    U.Nombre,
+    U.Apellido,
+    SUM(CASE WHEN A.Tamaño < 1000000 THEN 1 ELSE 0 END) AS ArchivosPequeños,
+    SUM(CASE WHEN A.Tamaño >= 1000000 THEN 1 ELSE 0 END) AS ArchivosGrandes
+FROM Usuarios U
+INNER JOIN Archivos A ON U.IDUsuario = A.IDUsuarioDueño
+GROUP BY U.IDUsuario, U.Nombre, U.Apellido
+HAVING 
+    SUM(CASE WHEN A.Tamaño < 1000000 THEN 1 ELSE 0 END) > 
+    SUM(CASE WHEN A.Tamaño >= 1000000 THEN 1 ELSE 0 END)
+    AND SUM(CASE WHEN A.Tamaño < 1000000 THEN 1 ELSE 0 END) > 0
+    AND SUM(CASE WHEN A.Tamaño >= 1000000 THEN 1 ELSE 0 END) > 0;
+
+    
 
 
 
