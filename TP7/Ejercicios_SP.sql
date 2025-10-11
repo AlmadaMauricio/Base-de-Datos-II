@@ -1,0 +1,40 @@
+USE DBTutorias;
+GO
+
+/* Realizar un procedimiento almacenado llamado sp_Agregar_Estudiante que permita registrar un estudiante en el sistema.
+El procedimiento debe recibir como parámetro Legajo, Nombre, Apellido y Email.*/
+Create Procedure sp_Agregar_Estudiante
+    @Legajo varchar(10),
+    @Nombre varchar(100),
+    @Apellido varchar(100),
+    @Email varchar(150)
+As
+Begin
+    Begin Try
+        -- Validamos que no exista el estudiante
+        If Exists (Select 1 From Estudiantes Where Legajo = @Legajo)
+        Begin
+            Raiserror('El legajo de estudiante ya existe.', 16, 1);
+            Return;
+        End;
+        -- Insertamos nuevo Estudiante.
+        Insert into Estudiantes(Legajo, Nombre, Apellido, Email, Activo)
+        Values(@Legajo, @Nombre, @Apellido, @Email, 1);
+        Print 'Estudiante insertado correctamente.';
+    End Try
+    Begin Catch
+        Print 'Error al insertar estudiante: ' + Error_Message();
+    End Catch;
+End;
+
+Select * From Estudiantes;
+EXEC sp_Agregar_Estudiante '111', 'Mauricio', 'Almada', 'mauri@estudiante.utn';
+
+/* 2 Realizar un procedimiento almacenado llamado sp_Agregar_Materia que permita registrar una materia en el sistema.
+El procedimiento debe recibir como parámetro el Nombre, el Nivel, Carrera y CodigoMateria.*/
+Create Procedure sp_Agregar_Materia
+    @Nombre Varchar(100),
+    @Nivel Tinyint,
+    @Carrera Varchar(100),
+    @CodigoMateria Varchar(4)
+End;
