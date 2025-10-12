@@ -34,7 +34,7 @@ EXEC sp_Agregar_Estudiante '111', 'Mauricio', 'Almada', 'mauri@estudiante.utn';*
 
 /* 2 Realizar un procedimiento almacenado llamado sp_Agregar_Materia que permita registrar una materia en el sistema.
 El procedimiento debe recibir como parámetro el Nombre, el Nivel, Carrera y CodigoMateria.*/
-Create Procedure sp_Agregar_Materia
+/*Create Procedure sp_Agregar_Materia
     @Nombre Varchar(100),
     @Nivel Tinyint,
     @Carrera Varchar(100),
@@ -60,4 +60,5 @@ Begin
 End;
 
 Select * from Materias;
-Exec sp_Agregar_Materia 'Programacion 1', 1, 'Tecnicatura universitaria en programacion', 1010;
+Exec sp_Agregar_Materia 'Programacion 1', 1, 'Tecnicatura universitaria en programacion', 1010;*/
+
