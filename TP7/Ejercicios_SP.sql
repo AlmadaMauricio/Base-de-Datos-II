@@ -3,7 +3,7 @@ GO
 
 /* Realizar un procedimiento almacenado llamado sp_Agregar_Estudiante que permita registrar un estudiante en el sistema.
 El procedimiento debe recibir como parámetro Legajo, Nombre, Apellido y Email.*/
-Create Procedure sp_Agregar_Estudiante
+/*Create Procedure sp_Agregar_Estudiante
     @Legajo varchar(10),
     @Nombre varchar(100),
     @Apellido varchar(100),
@@ -28,7 +28,9 @@ Begin
 End;
 
 Select * From Estudiantes;
-EXEC sp_Agregar_Estudiante '111', 'Mauricio', 'Almada', 'mauri@estudiante.utn';
+EXEC sp_Agregar_Estudiante '111', 'Mauricio', 'Almada', 'mauri@estudiante.utn';*/
+
+
 
 /* 2 Realizar un procedimiento almacenado llamado sp_Agregar_Materia que permita registrar una materia en el sistema.
 El procedimiento debe recibir como parámetro el Nombre, el Nivel, Carrera y CodigoMateria.*/
@@ -37,4 +39,25 @@ Create Procedure sp_Agregar_Materia
     @Nivel Tinyint,
     @Carrera Varchar(100),
     @CodigoMateria Varchar(4)
+As
+Begin
+    Begin Try 
+        --Validamos si existe la materia a insertar
+        If Exists (Select 1 From Materias Where CodigoMateria = @CodigoMateria)
+        Begin
+            Raiserror('El codigo de materia ya existe', 16, 1);
+            Return;
+        End;
+
+        --Insertamos una materia.
+        Insert into Materias(Nombre, Nivel, Carrera, CodigoMateria)
+        Values (@Nombre, @Nivel, @Carrera, @CodigoMateria);
+        Print 'Materia agregada correctamente.';
+    End Try
+    Begin Catch
+        Print 'Error al insertar una materia: ' + Error_Message();
+    End Catch;
 End;
+
+Select * from Materias;
+Exec sp_Agregar_Materia 'Programacion 1', 1, 'Tecnicatura universitaria en programacion', 1010;
