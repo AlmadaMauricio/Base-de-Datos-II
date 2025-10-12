@@ -62,3 +62,32 @@ End;
 Select * from Materias;
 Exec sp_Agregar_Materia 'Programacion 1', 1, 'Tecnicatura universitaria en programacion', 1010;*/
 
+/*Realizar un procedimiento almacenado llamado sp_Agregar_EstudianteMateria
+que permita registrar el postulamiento de un estudiante como tutor o alumno a una materia en el sistema.
+El procedimiento debe recibir como parámetro el IDEstudiante, el IDMateria y Rol (Tutor o Alumno).*/
+
+Create Procedure sp_Agregar_EstudianteMateria
+    @IDEstudiante int,
+    @IDMateria int,
+    @rol varchar(10)
+As
+Begin
+    Begin Try
+        -- Validamos si existe Estudiante postulado.
+        If Exists (Select 1 From EstudiantesMaterias Where IDEstudiante = @IDEstudiante and IDMateria = @IDMateria and rol = @rol)
+        Begin
+            Raiserror ('El estudiante ya se encuentra postulado', 16, 1);
+            Return;
+        End;
+
+        --Insertamos una materia.
+        Insert into EstudiantesMaterias(IDEstudiante, IDMateria, Rol)
+        Values(@IDEstudiante, @IDMateria, @rol);
+        Print 'Estudiante postulado correctamente.';
+    End Try 
+    Begin Catch
+        Print 'Error al postular un estudiante: ' + Error_Message();
+    End Catch
+End;
+
+Exec sp_Agregar_EstudianteMateria '1', '1', 'Alumno'
