@@ -104,7 +104,7 @@ Descontar los créditos al estudiante con rol de alumno de acuerdo con la duraci
 
 NOTA: Los estudiantes no pueden tener más de 5 créditos negativos.*/
 
-Create Procedure sp_Agregar_Tutoria
+/*Create Procedure sp_Agregar_Tutoria
     @IDEstudianteTutor int,
     @IDEstudianteAlumno int,
     @IDMateria int,
@@ -156,5 +156,67 @@ Begin
     Begin Catch
         PRINT 'Error al registrar la tutoría: ' + ERROR_MESSAGE();
     End Catch
-End;
+End;*/
 
+/* Realizar un procedimiento almacenado llamado sp_Confirmar_Tutoria que registre la confirmación por parte del Tutor o Alumno.
+El procedimiento debe recibir: el IDTutoria y el Rol de quien confirma.
+
+El procedimiento deberá:
+Si tiene ambas confirmaciones, se le deben sumar los créditos al tutor de acuerdo con la duración de la tutoría.
+Actualizar el estado de esta a “Realizada”.*/
+CREATE PROCEDURE sp_Confirmar_Tutoria
+    @IDTutoria INT,
+    @Rol VARCHAR(10) -- 'Tutor' o 'Alumno'
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    --Verificar que la tutoría exista
+    IF NOT EXISTS (SELECT 1 FROM Tutorias WHERE IDTutoria = @IDTutoria)
+    BEGIN
+        RAISERROR('La tutoría no existe.', 16, 1);
+        RETURN;
+    END
+
+    -- 2️⃣ Actualizar la confirmación correspondiente
+    IF @Rol = 'Tutor'
+        UPDATE Tutorias SET ConfirmaTutor = 1 WHERE IDTutoria = @IDTutoria;
+    ELSE IF @Rol = 'Alumno'
+        UPDATE Tutorias SET ConfirmaAlumno = 1 WHERE IDTutoria = @IDTutoria;
+    ELSE
+    BEGIN
+        RAISERROR('El rol debe ser "Tutor" o "Alumno".', 16, 1);
+        RETURN;
+    END
+
+    --Verificar si ya están ambas confirmaciones
+    DECLARE @ConfirmaTutor BIT, @ConfirmaAlumno BIT,
+            @Duracion TINYINT, @IDTutor INT;
+
+    SELECT 
+        @ConfirmaTutor = ConfirmaTutor,
+        @ConfirmaAlumno = ConfirmaAlumno,
+        @Duracion = Duracion,
+        @IDTutor = IDEstudianteTutor
+    FROM Tutorias
+    WHERE IDTutoria = @IDTutoria;
+
+    --Si ambas confirmaciones están dadas, actualizar estado y créditos
+    IF @ConfirmaTutor = 1 AND @ConfirmaAlumno = 1
+    BEGIN
+        -- Cambiar el estado a "REALIZADA"
+        UPDATE Tutorias
+        SET Estado = 'REALIZADA'
+        WHERE IDTutoria = @IDTutoria;
+
+        -- Sumar créditos al tutor según la duración
+        UPDATE Estudiantes
+        SET SaldoCredito = SaldoCredito + @Duracion
+        WHERE IDEstudiante = @IDTutor;
+
+        -- Registrar el movimiento en HistorialCreditos
+        INSERT INTO HistorialCreditos (IDEstudiante, Tipo, Cantidad, Descripcion)
+        VALUES (@IDTutor, 'SUMA', @Duracion, CONCAT('Tutoría ID ', @IDTutoria, ' realizada'));
+    END
+END;
+GO
