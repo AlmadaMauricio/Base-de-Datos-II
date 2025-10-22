@@ -5,26 +5,40 @@ use DBTutorias;
 - Verifique que no se repita el Rol para esa Materia y Estudiante.
 - Registre la postulación del estudiante.*/
 
-Create Trigger TR_Postulacion_Estudiante_Materia
-On EstudiantesMaterias
-After Insert
-As
-Begin
-    IF EXISTS(
-        Select 1 
-        From Inserted I
-        Inner Join Estudiantes E On I.IDEstudiante = E.IDEstudiante
-        Where E.Activo = 0
+GO
+CREATE TRIGGER TR_Postulacion_Estudiante_Materia
+ON EstudiantesMaterias
+AFTER INSERT
+AS
+BEGIN
+    -- Verifica si el estudiante insertado está inactivo
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN Estudiantes e ON i.IDEstudiante = e.IDEstudiante
+        WHERE e.Activo = 0
     )
-    Begin
-        RAISERROR('Existe.', 16, 1);
+    BEGIN
+        RAISERROR('El estudiante está inactivo y no puede postularse.', 16, 1);
         ROLLBACK TRANSACTION;
-        Return;
-    End;
+        RETURN;
+    END;
 
-    Print 'Postulacion exitosa.';
+    -- Verifica si ya existe el mismo rol para la misma materia y estudiante
+    IF EXISTS (
+        SELECT 1
+        FROM inserted i
+        INNER JOIN EstudiantesMaterias em
+            ON em.IDEstudiante = i.IDEstudiante
+           AND em.IDMateria = i.IDMateria
+           AND em.Rol = i.Rol
+    )
+    BEGIN
+        RAISERROR('Ya existe una postulación con el mismo rol para esta materia.', 16, 1);
+        ROLLBACK TRANSACTION;
+        RETURN;
+    END;
 
-
-
-End;
-
+    PRINT 'Postulación registrada exitosamente.';
+END;
+GO
