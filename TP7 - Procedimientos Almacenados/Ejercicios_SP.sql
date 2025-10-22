@@ -1,5 +1,6 @@
 USE DBTutorias;
 GO
+/**/
 
 /* Realizar un procedimiento almacenado llamado sp_Agregar_Estudiante que permita registrar un estudiante en el sistema.
 El procedimiento debe recibir como parámetro Legajo, Nombre, Apellido y Email.*/
