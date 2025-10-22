@@ -1,5 +1,3 @@
-Use master;
-
 CREATE DATABASE DBTutorias
 COLLATE Latin1_General_CI_AI;
 
