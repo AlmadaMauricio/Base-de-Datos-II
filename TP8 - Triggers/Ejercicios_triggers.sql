@@ -59,7 +59,6 @@ AS
 BEGIN
     ---------------------------------------------------------
     -- 1) Verificar que el tutor y el alumno no sean la misma persona
-    ---------------------------------------------------------
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -71,9 +70,8 @@ BEGIN
         RETURN;
     END;
 
-    ---------------------------------------------------------
+    
     -- 2) Verificar que ambos estudiantes estén activos
-    ---------------------------------------------------------
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -87,10 +85,9 @@ BEGIN
         RETURN;
     END;
 
-    ---------------------------------------------------------
+    
     -- 3) Verificar que el tutor y el alumno estén postulados
     --    en la materia con los roles correctos
-    ---------------------------------------------------------
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -115,9 +112,7 @@ BEGIN
         RETURN;
     END;
 
-    ---------------------------------------------------------
     -- 4) Verificar que el alumno tenga créditos suficientes
-    ---------------------------------------------------------
     IF EXISTS (
         SELECT 1
         FROM inserted i
@@ -130,26 +125,20 @@ BEGIN
         RETURN;
     END;
 
-    ---------------------------------------------------------
     -- 5) Descontar crédito al alumno
-    ---------------------------------------------------------
     UPDATE e
     SET e.SaldoCredito = e.SaldoCredito - 1
     FROM Estudiantes e
     INNER JOIN inserted i ON i.IDEstudianteAlumno = e.IDEstudiante;
 
-    ---------------------------------------------------------
     -- 6) Registrar el movimiento en el historial de créditos
-    ---------------------------------------------------------
     INSERT INTO HistorialCreditos (IDEstudiante, Tipo, Cantidad, Descripcion)
     SELECT 
         i.IDEstudianteAlumno,
         'DEBITO', 1, 'Descuento por registro de tutoría'
     FROM inserted i;
 
-    ---------------------------------------------------------
     -- 7) Registrar la tutoría
-    ---------------------------------------------------------
     INSERT INTO Tutorias (IDEstudianteTutor, IDEstudianteAlumno, IDMateria, Fecha, Duracion, ConfirmaTutor, ConfirmaAlumno, Estado)
     SELECT IDEstudianteTutor, IDEstudianteAlumno, IDMateria, Fecha, Duracion, ConfirmaTutor, ConfirmaAlumno, Estado
     FROM inserted;
